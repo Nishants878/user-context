@@ -16,20 +16,53 @@ export default function Contact() {
             setContactObjects({
                 ...snapshot.val()
             })
+            else
+            setContactObjects({})
+
             
         })
     },[])
 
   
      const addOrEdit =  obj =>{
-        firebaseDb.child('contacts').push(
-            obj,
-            err => {
-                if(err){
-                    console.log(err)
+
+        if(currentId === ''){
+            firebaseDb.child('contacts').push(
+                obj,
+                err => {
+                    if(err){
+                        console.log(err)
+                    }else{
+                        setCurrentId('')
+                    }
                 }
+            )
+        }else{
+            firebaseDb.child(`contacts/${currentId}`).set(
+                obj,
+                err =>{
+                    if(err)
+                    console.log(err)
+                    else
+                    setCurrentId('')
+                }
+            )
+        }
+      
+     }
+
+
+     const onDelete = (id) =>{
+            if(window.confirm('Are you sure to delete this record?')){
+                firebaseDb.child(`contacts/${id}`).remove(
+                    err =>{
+                        if(err)
+                        console.log(err)
+                        else
+                        setCurrentId('')
+                    }
+                )
             }
-        )
      }
 
     return (
@@ -41,7 +74,7 @@ export default function Contact() {
         </div>
         <div className="row">
             <div className="col-md-5">
-              <ContactForm  addOrEdit={addOrEdit} />
+              <ContactForm  {...({ addOrEdit,currentId,contactObject })} />
             </div>
             <div className="col-md-7">
                 <table className="table table-borderless table-stripped">
@@ -61,10 +94,10 @@ export default function Contact() {
                                     <td>{contactObject[id].mobile}</td>
                                     <td>{contactObject[id].email}</td>
                                    <td>
-                                       <a className="btn text-primary"   >
+                                       <a className="btn text-primary" onClick={() => setCurrentId(id)}   >
                                            <i className="fas fa-pencil-alt"></i>
                                        </a>
-                                       <a className="btn text-danger">
+                                       <a className="btn text-danger" onClick={()=> { onDelete(id) }}>
                                            <i className="fas fa-trash-alt"></i>
                                        </a>
                                    </td>

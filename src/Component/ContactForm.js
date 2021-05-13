@@ -2,6 +2,8 @@ import React,{ useState, useEffect } from 'react'
 
 export default function ContactForm(props) {
 
+ 
+
       
     const initialFieldValues = {
             fullName:"",
@@ -11,6 +13,25 @@ export default function ContactForm(props) {
     }
 
     const [values, setVales] = useState(initialFieldValues);
+
+   
+    useEffect(() =>{
+
+        if(props.currentId === "")
+            setVales({
+                fullName:"",
+                mobile:"",
+                email:"",
+                address:""
+            })
+        else{
+              setVales({
+                ...props.contactObject[props.currentId]
+              })    
+        }
+
+    },[props.currentId,props.contactObject])
+
 
     const handleInputChange = (e) =>{
         var { name, value } = e.target
@@ -71,7 +92,7 @@ export default function ContactForm(props) {
                 />
            </div>
            <div className="form-group">
-               <input type="submit" value="save" className="btn btn-primary btn-block"/>
+               <input type="submit" value={props.currentId === "" ? "Save":"Update"} className="btn btn-primary btn-block"/>
            </div>
        </form>
     )
